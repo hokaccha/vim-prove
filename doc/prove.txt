@@ -1,4 +1,4 @@
-*prove.txt*	description
+*prove.txt*	prove for vim plugin.
 
 Author:  Kazuhito Hokamura <http://webtech-walker.com/>
 Version: 0.0.1
