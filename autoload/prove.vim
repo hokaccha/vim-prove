@@ -5,8 +5,26 @@
 " License: MIT License <http://www.opensource.org/licenses/mit-license.php>
 
 
-function! prove#run_cmd(test_file)
-  if a:test_file == ''
+function! prove#run_cmd(arg)
+  let test_path = s:get_test_path(a:arg)
+  let root_dir  = s:get_root_dir(test_path)
+  let lib_dirs  = s:get_lib_dirs(root_dir)
+  let command   = s:get_command(test_path, root_dir, lib_dirs)
+  call s:open_window('[prove] prove', 'prove', command, 'rightbelow')
+endfunction 
+
+function! s:gsub(str, pat, rep)
+  return substitute(a:str, '\v'.a:pat, a:rep, 'g')
+endfunction
+
+function! s:error(str)
+  echohl ErrorMsg
+  echomsg a:str
+  echohl None
+endfunction
+
+function! s:get_test_path(arg)
+  if a:arg == ''
     let test_path = expand('%:p')
     if !filereadable(test_path)
       let test_path = tempname() . expand('%:e')
@@ -19,37 +37,66 @@ function! prove#run_cmd(test_file)
       let &l:modified = original_modified
     endif
   else
-    let test_path = fnamemodify(a:test_file, ':p')
+    let test_path = fnamemodify(a:arg, ':p')
     if !filereadable(test_path) && !isdirectory(test_path)
       call s:error('no such file or directory')
-      return
     endif
   endif
-
-  let lib_dirs = ''
-  if exists('b:perl_project_libs')
-    for lib_dir in b:perl_project_libs
-      let lib_dirs .= ' -I' . lib_dir
-    endfor
-  endif
-
-  let command = ''
-  if exists('b:perl_project_home')
-    let command = printf('cd %s;', b:perl_project_home)
-  endif
-  let command .= printf('prove -vr %s %s', lib_dirs, test_path)
-
-  call s:open_window('[prove] test', 'prove', command, 'rightbelow')
-endfunction 
-
-function! s:gsub(str, pat, rep)
-  return substitute(a:str, '\v'.a:pat, a:rep, 'g')
+  return test_path
 endfunction
 
-function! s:error(str)
-  echohl ErrorMsg
-  echomsg a:str
-  echohl None
+function! s:get_root_dir(path)
+  let t_dir = finddir('t', a:path.';')
+  let root_dir = ''
+  if t_dir != ''
+    let root_dir = substitute(fnamemodify(t_dir, ':p'), '\/t\/$', '', '')
+  endif
+  return root_dir
+endfunction
+
+function! s:get_lib_dirs(root_dir)
+  let lib_dirs = []
+
+  if exists('b:prove_lib_dirs')
+    lib_dirs += b:prove_lib_dirs
+  endif
+
+  if exists('g:prove_lib_dirs')
+    lib_dirs += g:prove_lib_dirs
+  endif
+
+  let locallib_dir = s:gsub(g:prove_local_lib_dir,
+  \ '\%prove_root\%', a:root_dir)
+
+  if !isdirectory(locallib_dir)
+    return lib_dirs
+  endif
+
+  let perl5lib = system('perl -e ''
+  \   eval { require local::lib };
+  \   exit if $@;
+  \   %env=local::lib->build_environment_vars_for("'.locallib_dir.'", 1);
+  \   print $env{PERL5LIB}
+  \''')
+
+  let lib_dirs += split(perl5lib, ':')
+  
+  return lib_dirs
+endfunction
+
+function! s:get_command(test_path, root_dir, lib_dirs)
+  let lib_dirs = ''
+  for lib_dir in a:lib_dirs
+    let lib_dirs .= ' -I' . lib_dir
+  endfor
+
+  let command = ''
+  if a:root_dir != ''
+    let command = printf('cd %s;', a:root_dir)
+  endif
+  let command .= printf('prove -lvr %s %s', lib_dirs, a:test_path)
+
+  return command
 endfunction
 
 function! s:open_window(bufname, filetype, command, win_pos)
@@ -78,48 +125,11 @@ function! s:open_window(bufname, filetype, command, win_pos)
   call append(0, 'now loading...')
   redraw
   silent % delete _
-  call append(0, '')
+  if g:prove_debug == 1
+    call append(0, a:command)
+  endif
   execute 'silent! read !' a:command
   1
-endfunction
-
-function! s:get_module_name(module)
-  if a:module == ''
-    return s:get_cursor_module_name()
-  else
-    return a:module
-  endif
-endfunction
-
-function! s:get_cursor_module_name()
-  let regex = '[a-zA-Z0-9:_]\+'
-  let orig_pos = getpos('.')[1:2]
-
-  let start_col = searchpos('[a-zA-Z0-9:_]\+', 'bW')[1]
-  let end_col   = searchpos('[a-zA-Z0-9:_]\+', 'ceW')[1]
-
-  let module_name = strpart(getline('.'),
-  \                        start_col - 1,
-  \                        end_col - start_col + 1)
-
-  call cursor(orig_pos)
-
-  return module_name
-endfunction
-
-function! s:get_module_path(module)
-  let lib_dirs = []
-  if exists('b:perl_project_libs')
-    let lib_dirs += b:perl_project_libs
-  endif
-  let lib_dirs += split(system('perl -e "print join \":\", @INC"'), ':')
-
-  for dir in lib_dirs
-    let module_path = dir . '/' . s:gsub(a:module, '::', '/') . '.pm'
-    if filereadable(module_path)
-      return module_path
-    endif
-  endfor
 endfunction
 
 " __END__
