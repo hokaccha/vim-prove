@@ -1,4 +1,4 @@
-" prove.vim - description
+" prove.vim - prove for vim plugin.
 "
 " Author:  Kazuhito Hokamura <http://webtech-walker.com/>
 " Version: 0.0.1
@@ -12,6 +12,6 @@ let g:loaded_prove = 1
 let s:save_cpo = &cpo
 set cpo&vim
 
-" plugin code here
+command! -nargs=? -complete=file Prove :call prove#run_cmd(<q-args>)
 
 let &cpo = s:save_cpo
