@@ -6,6 +6,11 @@
 
 
 function! prove#run_cmd(arg)
+  if !executable('prove')
+    call s:error('required prove command')
+    return
+  endif
+
   let test_path = s:get_test_path(a:arg)
   let root_dir  = s:get_root_dir(test_path)
   let lib_dirs  = s:get_lib_dirs(root_dir)
