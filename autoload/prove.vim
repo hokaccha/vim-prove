@@ -12,6 +12,11 @@ function! prove#run_cmd(arg)
   endif
 
   let test_path = s:get_test_path(a:arg)
+  if test_path ==# ''
+    call s:error('no such file or directory')
+    return
+  endif
+
   let root_dir  = s:get_root_dir(test_path)
   let lib_dirs  = s:get_lib_dirs(root_dir)
   let command   = s:get_command(test_path, root_dir, lib_dirs)
@@ -44,7 +49,7 @@ function! s:get_test_path(arg)
   else
     let test_path = fnamemodify(a:arg, ':p')
     if !filereadable(test_path) && !isdirectory(test_path)
-      call s:error('no such file or directory')
+      return ''
     endif
   endif
   return test_path
