@@ -1,7 +1,7 @@
 *prove.txt*	prove for vim plugin.
 
 Author:  Kazuhito Hokamura <http://webtech-walker.com/>
-Version: 0.0.1
+Version: 0.0.2
 License: MIT License <http://www.opensource.org/licenses/mit-license.php>
 
 ==============================================================================
@@ -11,6 +11,7 @@ INTRODUCTION		|prove-introduction|
 INTERFACE		|prove-interface|
   COMMANDS		  |prove-commands|
   VARIABLES		  |prove-variables|
+CHANGELOG		|prove-changelog|
 
 ==============================================================================
 INTRODUCTION					*prove-introduction*
@@ -62,6 +63,16 @@ g:prove_debug					g:prove_debug
 			結果の一番上に実行したコマンドが表示されます。
 			local::libなどの設定がうまくいかないときに使うと
 			いいでしょう。
+
+==============================================================================
+CHANGELOG					*prove-changelog*
+
+0.0.2	2010-05-10
+	- エラーシンタックスに#から始まるメッセージを追加。
+	- g:prove_debugが定義されてないときにエラーになるバグを修正。
+
+0.0.1	2010-04-19
+	- 初版。
 
 ==============================================================================
 vim:tw=78:ts=8:ft=help:norl:fen:fdl=0:fdm=marker:
