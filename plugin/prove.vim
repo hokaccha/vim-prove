@@ -14,6 +14,10 @@ set cpo&vim
 
 command! -nargs=? -complete=file Prove :call prove#run_cmd(<q-args>)
 
+if !exists('g:prove_debug')
+  let g:prove_debug = 0
+endif
+
 if !exists('g:prove_use_local_lib')
   let g:prove_use_local_lib = 1
 endif
