@@ -12,6 +12,7 @@ syntax match proveError /^Dubious.*/
 syntax match proveError /^Failed.*/
 syntax match proveError /^not ok.*/
 syntax match proveError /Result: FAIL/
+syntax match proveError /^#.*/
 syntax match proveSuccess /All tests successful./
 
 highlight proveError guifg=#CC0000 ctermfg=red
