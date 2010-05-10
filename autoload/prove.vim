@@ -40,10 +40,10 @@ function! s:get_test_path(arg)
       let test_path = tempname() . expand('%:e')
       let original_bufname = bufname('')
       let original_modified = &l:modified
-        silent keepalt write `=test_path`
-        if original_bufname == ''
-          silent 0 file
-        endif
+      silent keepalt write `=test_path`
+      if original_bufname == ''
+        silent 0 file
+      endif
       let &l:modified = original_modified
     endif
   else
