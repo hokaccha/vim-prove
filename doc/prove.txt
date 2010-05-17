@@ -1,7 +1,7 @@
 *prove.txt*	prove for vim plugin.
 
 Author:  Kazuhito Hokamura <http://webtech-walker.com/>
-Version: 0.0.3
+Version: 0.0.2
 License: MIT License <http://www.opensource.org/licenses/mit-license.php>
 
 ==============================================================================
@@ -26,19 +26,11 @@ INTERFACE					*prove-interface*
 ------------------------------------------------------------------------------
 COMMANDS					*prove-commands*
 
-:Prove [{file} {ENV}]					*:Prove*
+:Prove {file}					*:Prove*
 			This command exec prove. When file is not specified,
 			it is current buffer is targeted.
 			When the directory is specified for file, the
 			directory is recurrently tested. 
-			The environment variable specified ahead of the prove
-			command that the environment variable is specified
-			for {ENV} is added and prove is executed. 
-			For exsample, it is useful for the specification of
-			DBIC_TRACE etc.
->
-			:Prove foo.t DBIC_TRACE=1
-<
 
 ------------------------------------------------------------------------------
 VARIABLES					*prove-variables*
@@ -71,9 +63,6 @@ g:prove_debug					g:prove_debug
 
 ==============================================================================
 CHANGELOG					*prove-changelog*
-
-0.0.3	2010-05-11
-	- The environment variable was able to be specified.
 
 0.0.2	2010-05-10
 	- Added error syntax, when /^#.*/

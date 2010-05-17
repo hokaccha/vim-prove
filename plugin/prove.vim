@@ -1,18 +1,18 @@
 " prove.vim - prove for vim plugin.
 "
 " Author:  Kazuhito Hokamura <http://webtech-walker.com/>
-" Version: 0.0.3
+" Version: 0.0.2
 " License: MIT License <http://www.opensource.org/licenses/mit-license.php>
 
 if exists('g:loaded_prove')
-  finish
+    finish
 endif
 let g:loaded_prove = 1
 
 let s:save_cpo = &cpo
 set cpo&vim
 
-command! -nargs=* -complete=file Prove :call prove#run_cmd(<q-args>)
+command! -nargs=? -complete=file Prove :call prove#run_cmd(<q-args>)
 
 if !exists('g:prove_debug')
   let g:prove_debug = 0

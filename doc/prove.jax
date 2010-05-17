@@ -1,7 +1,7 @@
 *prove.txt*	prove for vim plugin.
 
 Author:  Kazuhito Hokamura <http://webtech-walker.com/>
-Version: 0.0.3
+Version: 0.0.2
 License: MIT License <http://www.opensource.org/licenses/mit-license.php>
 
 ==============================================================================
@@ -26,7 +26,7 @@ INTERFACE					*prove-interface*
 ------------------------------------------------------------------------------
 COMMANDS					*prove-commands*
 
-:Prove [{file} {ENV}]					*:Prove*
+:Prove {file}					*:Prove*
 			proveを実行します。fileを指定しなかった場合はカレント
 			バッファを対象とします。
 			fileにディレクトリを指定した場合はそのディレクトリを
@@ -34,13 +34,6 @@ COMMANDS					*prove-commands*
 			対象のファイルからさかのぼって t というを探してそこを
 			rootディレクトリとして設定し、このrootディレクトリに
 			cdしてproveを実行します。
-			{ENV}に環境変数を指定するとproveコマンドの前に指定した
-			環境変数を追加してproveを実行します。
-			例えば、以下の様なDBIC_TRACEを出すときなどに役立ちま
-			す。
->
-			:Prove foo.t DBIC_TRACE=1
-<
 
 ------------------------------------------------------------------------------
 VARIABLES					*prove-variables*
@@ -73,9 +66,6 @@ g:prove_debug					g:prove_debug
 
 ==============================================================================
 CHANGELOG					*prove-changelog*
-
-0.0.3	2010-05-11
-	- 環境変数を指定できるようにした。
 
 0.0.2	2010-05-10
 	- エラーシンタックスに#から始まるメッセージを追加。
