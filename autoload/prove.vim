@@ -1,17 +1,19 @@
 " prove.vim - prove for vim plugin.
 "
 " Author:  Kazuhito Hokamura <http://webtech-walker.com/>
-" Version: 0.0.2
+" Version: 0.0.3
 " License: MIT License <http://www.opensource.org/licenses/mit-license.php>
 
 
-function! prove#run_cmd(arg)
+function! prove#run_cmd(args)
   if !executable('prove')
     call s:error('required prove command')
     return
   endif
 
-  let test_path = s:get_test_path(a:arg)
+  let [path, env] = s:parse_args(a:args)
+
+  let test_path = s:get_test_path(path)
   if test_path ==# ''
     call s:error('no such file or directory')
     return
@@ -19,7 +21,7 @@ function! prove#run_cmd(arg)
 
   let root_dir  = s:get_root_dir(test_path)
   let lib_dirs  = s:get_lib_dirs(root_dir)
-  let command   = s:get_command(test_path, root_dir, lib_dirs)
+  let command   = s:get_command(test_path, root_dir, lib_dirs, env)
   call s:open_window('[prove] prove', 'prove', command, 'rightbelow')
 endfunction 
 
@@ -31,6 +33,23 @@ function! s:error(str)
   echohl ErrorMsg
   echomsg a:str
   echohl None
+endfunction
+
+function! s:parse_args(args)
+  if a:args == ''
+    let path = ''
+    let env  = ''
+  else
+    try
+      let [path, env] = matchlist(a:args, '\v^(\S+)\s*(.*)$')[1:2]
+    catch /^Vim(let):E688:/
+      echoerr 'prove: Invalid argument: ' . a:args
+    catch /^prove:/
+      echoerr v:exception
+    endtry
+  endif
+
+  return [path, env]
 endfunction
 
 function! s:get_test_path(arg)
@@ -94,7 +113,7 @@ function! s:get_lib_dirs(root_dir)
   return lib_dirs
 endfunction
 
-function! s:get_command(test_path, root_dir, lib_dirs)
+function! s:get_command(test_path, root_dir, lib_dirs, env)
   let lib_dirs = ''
   for lib_dir in a:lib_dirs
     let lib_dirs .= ' -I' . lib_dir
@@ -104,7 +123,7 @@ function! s:get_command(test_path, root_dir, lib_dirs)
   if a:root_dir != ''
     let command = printf('cd %s;', a:root_dir)
   endif
-  let command .= printf('prove -lvr %s %s', lib_dirs, a:test_path)
+  let command .= printf('%s prove -lvr %s %s', a:env, lib_dirs, a:test_path)
 
   return command
 endfunction
